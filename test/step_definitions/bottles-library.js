@@ -2,9 +2,8 @@
 var assert = require('assert');
 var jasmine = require('jasmine');
 var english = require('yadda').localisation.English;
-var Wall = require('../..');
+var Wall = require('../js/Wall.js');
 var wall;
-Yadda.plugins.jasmine.
 
 module.exports = english.library()
     .given('$NUM green bottles are standing on the wall', function(number, next){
