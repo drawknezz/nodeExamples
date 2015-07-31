@@ -1,0 +1,2 @@
+-Non-blocking I/O means that I/O happens outside the event loop.
+-Dirty applications: Data-intensive real-time applications.

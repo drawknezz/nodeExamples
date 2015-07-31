@@ -1,0 +1,44 @@
+Backbone.js
+
+-Separates the data from the DOM using models and views.
+-A model holds the data
+-A view renders the HTML to the DOM
+MODELS
+-to define a Model class one can extend it from Backbone.Model: var ExampleModelClass = Backbone.Model.extend();
+-To instantiate our new Model class we use: var model = new ExampleModelClass({data1: val1, data2: val2});
+-To get attributes from our model we use: model.get('data1');
+-To set an attribute we use: model.set({data1: newVal});
+-To sync our model to the server, we call model.save();
+-To be able to fetch data from the server, we have to set the url property of a model: model.url = '/getProducts';
+-To populate the model with data coming from the server we use: model.fetch();
+-While extending our model from model, we can specify the urlRoot property, to specify a Restful url: var model = Backbone.Model.extend( {urlRoot: '/todos'} );
+-After specifying the urlRoot property, when we call fetch on the model, the model is going to send a GET request to that url.
+-After specifying the urlRoot property, when we call save on the model, the model is going to send a PUT request to that url.
+-When we create a new model, the first time we call save, it's going to send a POST request to the urlRoot url.
+-When we want to delete a model, we call model.destroy(), which sends a DELETE request to the urlRoot url.
+-To get the JSON from the model, we call model.toJSON();
+-When extending Backbone.Model we can specify default values for our class: var ExampleModelClass = Backbone.Model.extend( {defaults: {data1: val1} } );
+-To make our model to listen to some event, we simply call model.on('event-name', function(){});
+-To trigger some event on our model, we call model.trigger('event-name');
+-Models come with some default events that are called automatically:
+	-'change': when some change happens on our model. Change gets called when calling set. To avoid that we can use: model.set({data}, {silent: true});
+	-'change:<attr>': when some attribute has been changed on our model.
+	-'destroy': when our model has been destroyed.
+	-'sync': when a successful sync is completed.
+	-'error': when model save or validation fails.
+	-'all': when any event gets called.
+-To remove event listeners from our models, we use: model.off('event-name);
+VIEWS
+-to define a View class one can extend it from Backbone.View: var ExampleViewClass = Backbone.View.extend({ render: fn(){} });
+-On the render function of a view, we can access the model via this.model: this.model.get(data1);
+-Every view has a reference to its HTML element, we can access to its reference inside the render function via this.el
+-Inside the render function, to set the html of the element, we can call: this.el.html('<html></html>');
+-The el property of the view defaults to div.
+-To access the html of the el property of our view in the render function we can use: this.$el.html(), and to set it: this.$el.html('<html>')
+-To instantiate our new View class we use: var view = new ExampleViewClass({data1: val1, data2: val2});
+-To specify the tagname for a new view class, we can specify the tagName property while extending: var ExampleViewClass = Backbone.View.extend({tagName: 'li'})
+-To specify DOM events on our views, while extending View, we pass a events object, specifying each event, its selector, and the name function to be invoked:
+	- var ExampleViewClass = Backbone.View.extend({ events: 'click h3' : 'functionName', functionName: function() {} });
+	- If no selector is specified, then the event is going to be delegated to every child element on the view's el element:
+		- Backbone.View.extend({ events: 'click' : 'functionName', functionName: function() {} });
+-To specify the model for a new View instance, we pass it this way: var view = new ExampleViewClass( {model: model} );

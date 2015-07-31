@@ -1,0 +1,61 @@
+INTERPRETER
+-The yadda interpreter iterates over an array of strings (steps), and executes their associated function with the parameters parsed from these strings.
+
+	var steps = ['Step 1', 'Step 2', 'Step 3'];
+	Yadda.createInstance(library).run(steps);
+	
+STEP LIBRARY
+-Step libraries hold the mapping between strings and functions. The mapping key is a regular expression which is used to parse the parameters passed to each function call.
+
+	var library = new Yadda.Library(dictionary);
+	library.define(/Step (\\d+)/, function(number){
+		...
+	});
+-There are synchronous and asynchronous steps, the asynchronous steps have a callback that's called when they're done, to execute the next step.
+-There exist some predefined step libraries with defined steps, like Yadda.localization.English.library() which has a Given, Then and When steps defined.
+-It's possible to define aliases for every step, passing additional strings while defining every step
+	Yadda.localization.English.library().given('$name has $num book', '$name has $num books', function(name, number_of_books){ ... });
+-A step without a defined function won't be executed
+	new Yadda.library().define('some step);
+	
+DICTIONARY
+-A dictionary can be used to simplify the strings of every step, by defining aliases to some regex for example. 
+	var dictionary = new Yadda.Dictionary();
+	dictionary.define('number', /(\d+)/, Yadda.converters.integer);
+	dictionary.define('gender', /(male|female)/)
+	
+	var library = new Yadda.Library(dictionary);
+	library.define('Step $number', function(number){ ... });
+	library.define('A $gender user', function(gender){ ... });
+	
+	coverters
+	-A converter can be used to manipulate a parsed value from a step string:
+		var dictionary = new Yadda.Dictionary().define('num', /(\d+)/, Yadda.converters.integer);
+		
+		var library = Yadda.localization.English.library(dictionary).given('A whole number $num', function(num) { num here would be a number instead of string });
+	-A custom converter is a function with the same number of arguments as matching groups in the definition string of the dictionary, plus a callback:
+		function quantity_converter	(amount, units, cb){
+			cb(null, {amount: amount, units: units});
+		}
+		
+		var dictionary = new Yadda.dictionary().define('quantity', /(\d+) (\w+)/, quantity_converter);
+		
+		var library = Yadda.localization.English.library(dictionary).given('A delay of $quantity', function(quantity){ quantity will be an object with two fields 'amount' and 'unit' });
+
+-Definitions in a dictionary can be nested:
+	dictionary.define('address', '$street, postcode').define('street', /(\d+) (\w+)/).define('postcode', /((GIR &0AA)|((([A-PR-UWYZ][A-HK-Y]?[0-9][0-9]?)|(([A-PR-UWYZ][0-9][A-HJKSTUW])|([A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRV-Y]))) &[0-9][ABD-HJLNP-UW-Z]{2}))/);
+	
+	Yadda.localization.English.library(dictionary).given('An $address', function(number, street, postcode) { ... });
+	
+CONTEXTS
+-To share information between steps in different libraries we can use a context
+	var library = Yadda.localization.English.library()
+		.given('A user called $name', function(name){
+			this.ctx[name] = new User(name);
+		})
+		.when('$name logs in', function(name){
+			var user = this.ctx[name];
+			user.login();
+		});
+		
+	Yadda.createInstance(library, { ctx: {} }).run(steps);
